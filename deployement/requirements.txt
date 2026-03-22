@@ -1,0 +1,7 @@
+flask
+transformers
+peft
+bitsandbytes
+accelerate
+torch
+scipy

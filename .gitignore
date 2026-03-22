@@ -1,0 +1,31 @@
+# =====================
+# Python & Environment
+# =====================
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+env/
+.env
+
+# =====================
+# Machine Learning & Data
+# =====================
+*.pt
+*.pth
+*.safetensors
+*.onnx
+.ipynb_checkpoints/
+
+# =====================
+# Nyaya AI Specific Files
+# =====================
+# Ignore the generated LoRA adapter weights
+nyaya_lora/
+
+# Ignore the SFTTrainer checkpoint results
+results/
+
+# Ignore the dataset (best practice to not commit large datasets)
+nyaya_clean_data.json

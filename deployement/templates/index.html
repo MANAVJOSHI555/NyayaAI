@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nyaya | Enterprise Legal AI</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #0b0f19; /* Deep space black */
+            --glass-bg: rgba(20, 25, 40, 0.6);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --user-msg: linear-gradient(135deg, #2563eb, #1d4ed8); /* Vibrant Blue */
+            --ai-msg: rgba(255, 255, 255, 0.03);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            /* Subtle purple/blue mesh background glow */
+            background-image: 
+                radial-gradient(circle at 15% 50%, rgba(37, 99, 235, 0.08) 0%, transparent 50%),
+                radial-gradient(circle at 85% 30%, rgba(147, 51, 234, 0.08) 0%, transparent 50%);
+            color: var(--text-main);
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Frosted Glass Header */
+        header {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            padding: 1.2rem 3rem;
+            border-bottom: 1px solid var(--glass-border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 10;
+        }
+        
+        .logo {
+            font-size: 1.4rem;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-icon {
+            width: 24px;
+            height: 24px;
+            background: var(--user-msg);
+            border-radius: 6px;
+        }
+        
+        .badge {
+            background: rgba(59, 130, 246, 0.1);
+            color: #60a5fa;
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        /* Chat Layout */
+        #chat-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 3rem 10%;
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+            scroll-behavior: smooth;
+        }
+
+        #chat-container::-webkit-scrollbar { width: 6px; }
+        #chat-container::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+
+        .message-wrapper {
+            display: flex;
+            gap: 1rem;
+            max-width: 80%;
+            animation: fadeIn 0.4s ease forwards;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .user-wrapper {
+            align-self: flex-end;
+            flex-direction: row-reverse;
+        }
+
+        .ai-wrapper {
+            align-self: flex-start;
+        }
+
+        /* Avatars */
+        .avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.85rem;
+            font-weight: 600;
+            flex-shrink: 0;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+
+        .user-avatar {
+            background: #cbd5e1;
+            color: #0f172a;
+        }
+
+        .ai-avatar {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--glass-border);
+            color: #60a5fa;
+        }
+
+        /* Chat Bubbles */
+        .message {
+            padding: 1.2rem 1.5rem;
+            border-radius: 16px;
+            line-height: 1.6;
+            font-size: 0.95rem;
+            letter-spacing: 0.2px;
+        }
+
+        .user-message {
+            background: var(--user-msg);
+            color: white;
+            border-top-right-radius: 4px;
+            box-shadow: 0 8px 20px rgba(37, 99, 235, 0.2);
+        }
+
+        .ai-message {
+            background: var(--ai-msg);
+            border: 1px solid var(--glass-border);
+            border-top-left-radius: 4px;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            color: #e2e8f0;
+        }
+
+        /* Floating Input Area */
+        .input-container {
+            padding: 1.5rem 10% 0.5rem 10%;
+            background: linear-gradient(to top, var(--bg-color) 70%, transparent);
+            position: relative;
+        }
+
+        .input-box {
+            display: flex;
+            gap: 12px;
+            max-width: 900px;
+            margin: 0 auto;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            padding: 8px;
+            border-radius: 24px;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+
+        .input-box:focus-within {
+            border-color: rgba(59, 130, 246, 0.5);
+            box-shadow: 0 10px 40px rgba(37, 99, 235, 0.15);
+        }
+
+        input[type="text"] {
+            flex: 1;
+            padding: 0.8rem 1.5rem;
+            background: transparent;
+            border: none;
+            color: white;
+            font-size: 1rem;
+            outline: none;
+        }
+
+        input[type="text"]::placeholder { color: #64748b; }
+
+        button {
+            background: var(--user-msg);
+            color: white;
+            border: none;
+            padding: 0 2rem;
+            border-radius: 18px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: opacity 0.2s, transform 0.1s;
+        }
+
+        button:hover { opacity: 0.9; }
+        button:active { transform: scale(0.98); }
+
+        /* Sleek Typing Animation */
+        .typing-indicator {
+            display: none;
+            padding: 1.2rem 1.5rem;
+            background: var(--ai-msg);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            border-top-left-radius: 4px;
+            backdrop-filter: blur(12px);
+            width: fit-content;
+            align-self: flex-start;
+        }
+
+        .dot {
+            display: inline-block;
+            width: 6px;
+            height: 6px;
+            background-color: #60a5fa;
+            border-radius: 50%;
+            margin: 0 3px;
+            animation: bounce 1.4s infinite ease-in-out both;
+        }
+
+        .dot:nth-child(1) { animation-delay: -0.32s; }
+        .dot:nth-child(2) { animation-delay: -0.16s; }
+        
+        @keyframes bounce {
+            0%, 80%, 100% { transform: scale(0); }
+            40% { transform: scale(1); }
+        }
+
+        /* Legal Disclaimer */
+        .disclaimer {
+            text-align: center;
+            font-size: 0.7rem;
+            color: #475569;
+            padding-bottom: 1.5rem;
+            font-weight: 400;
+            background: var(--bg-color);
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo">
+            <div class="logo-icon"></div>
+            Nyaya <span style="font-weight:300; color: var(--text-muted)">Intelligence</span>
+        </div>
+        <div class="badge">BNS 2024 Engine Active</div>
+    </header>
+
+    <div id="chat-container">
+        <div class="message-wrapper ai-wrapper">
+            <div class="avatar ai-avatar">NY</div>
+            <div class="message ai-message">
+                Welcome to Nyaya. I am an advanced legal intelligence assistant trained on the Bharatiya Nyaya Sanhita (BNS). How can I assist with your legal research today?
+            </div>
+        </div>
+        
+        <div id="typing-indicator" class="message-wrapper ai-wrapper typing-indicator">
+            <div class="avatar ai-avatar">NY</div>
+            <div style="padding: 0.2rem 0.5rem">
+                <span class="dot"></span>
+                <span class="dot"></span>
+                <span class="dot"></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="input-container">
+        <div class="input-box">
+            <input type="text" id="user-input" placeholder="Query the BNS database..." autocomplete="off" onkeypress="handleKeyPress(event)">
+            <button onclick="sendMessage()">Analyze</button>
+        </div>
+    </div>
+
+    <div class="disclaimer">
+        Nyaya AI is an experimental legal research tool. It does not constitute official legal advice. Always consult a qualified advocate.
+    </div>
+
+    <script>
+        const chatContainer = document.getElementById('chat-container');
+        const userInput = document.getElementById('user-input');
+        const typingIndicator = document.getElementById('typing-indicator');
+
+        function handleKeyPress(event) {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
+        }
+
+        async function sendMessage() {
+            const text = userInput.value.trim();
+            if (!text) return;
+
+            // 1. Add User Message
+            appendUserMessage(text);
+            userInput.value = '';
+            
+            // 2. Show Loading State (Move it to the bottom)
+            chatContainer.appendChild(typingIndicator);
+            typingIndicator.style.display = 'flex';
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+
+            try {
+                // 3. Send to Flask Backend
+                const response = await fetch('/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message: text })
+                });
+
+                const data = await response.json();
+
+                // 4. Hide Loading and Add AI Message
+                typingIndicator.style.display = 'none';
+                appendAIMessage(data.response);
+
+            } catch (error) {
+                typingIndicator.style.display = 'none';
+                appendAIMessage('Connection to the local LLM failed. Ensure the Flask server is running.');
+            }
+        }
+
+        function appendUserMessage(text) {
+            const msgDiv = document.createElement('div');
+            msgDiv.className = `message-wrapper user-wrapper`;
+            msgDiv.innerHTML = `
+                <div class="avatar user-avatar">ME</div>
+                <div class="message user-message">${text}</div>
+            `;
+            chatContainer.insertBefore(msgDiv, typingIndicator);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+
+        function appendAIMessage(text) {
+            const msgDiv = document.createElement('div');
+            msgDiv.className = `message-wrapper ai-wrapper`;
+            msgDiv.innerHTML = `
+                <div class="avatar ai-avatar">NY</div>
+                <div class="message ai-message">${text}</div>
+            `;
+            chatContainer.insertBefore(msgDiv, typingIndicator);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+    </script>
+</body>
+</html>
