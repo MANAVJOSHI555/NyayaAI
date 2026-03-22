@@ -21,7 +21,7 @@ base_model = AutoModelForCausalLM.from_pretrained(
     trust_remote_code=False,  
 )
 
-print(f"🔗 Loading Your Adapter from: {adapter_path}...")
+print(f"Loading Your Adapter from: {adapter_path}...")
 
 if not os.path.exists(adapter_path):
     print(f"ERROR: The folder '{adapter_path}' does not exist!")
