@@ -20,7 +20,7 @@ We built a Local RAG (Retrieval-Augmented Generation) system integrated with a c
 4. **RAG Integration & Guardrails:** Building the retrieval pipeline to ensure the model only answers based on retrieved context. If the law isn't in the retrieved context, the model is trained to state that it doesn't know.
 
 ## 🧠 Key Design Choices
-* **RAG over Pure Fine-Tuning:** Fine-tuning teaches the model *how* to talk (adopting a formal, legal tone), but RAG gives it the actual *facts*. We chose RAG as the primary source of truth to absolutely minimize legal hallucinations.
+* **RAG over Pure Fine-Tuning:** Fine-tuning teaches the model *how* to talk (adopting a formal, legal tone), but RAG gives it the actual *facts*. I chose RAG as the primary source of truth to absolutely minimize legal hallucinations.
 * **4-bit Quantization:** Essential for democratizing the project. By quantizing the model, it runs efficiently on standard hardware rather than requiring massive enterprise server clusters.
 * **LoRA (Low-Rank Adaptation):** Allowed us to train the model quickly and save the learned weights as a tiny, manageable adapter rather than saving and transferring a massive, entirely new model.
 
