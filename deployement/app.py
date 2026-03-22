@@ -8,18 +8,16 @@ import re
 
 app = Flask(__name__)
 
-# --- 1. LOAD THE FULL BNS DATABASE ---
-print("📂 Loading the 365-Section BNS Database...")
+print("Loading the 365-Section BNS Database...")
 try:
     with open('bns_data.json', 'r', encoding='utf-8') as f:
         bns_db = json.load(f)
-    print(f"✅ Success! {len(bns_db)} BNS laws loaded into memory.")
+    print(f"Success! {len(bns_db)} BNS laws loaded into memory.")
 except FileNotFoundError:
-    print("⚠️ Warning: bns_data.json not found. Nyaya will rely on memory.")
+    print("Warning: bns_data.json not found. Nyaya will rely on memory.")
     bns_db = {}
 
-# --- 2. SETUP THE MODEL (Quantized for RTX 4050) ---
-print("🚀 Flask is waking up Nyaya... (Please wait...)")
+print("Flask is waking up Nyaya... (Please wait...)")
 base_model_name = "microsoft/Phi-3.5-mini-instruct"
 adapter_path = "./nyaya_lora"
 
@@ -37,17 +35,15 @@ base_model = AutoModelForCausalLM.from_pretrained(
 )
 
 if not os.path.exists(adapter_path):
-    print(f"❌ Error: Cannot find {adapter_path}")
+    print(f"Error: Cannot find {adapter_path}")
 else:
     model = PeftModel.from_pretrained(base_model, adapter_path)
     tokenizer = AutoTokenizer.from_pretrained(base_model_name, trust_remote_code=False)
-    print("✅ Nyaya is Online!")
+    print("Nyaya is Online!")
 
-# --- 3. UPGRADED SMART SEARCH ENGINE (KEY-VALUE FIX) ---
 def search_bns(query):
     query = query.lower()
     
-    # STRATEGY 1: Exact Match
     match = re.search(r'(?:section|sec)\s*(\d+[a-z]?)', query)
     if not match:
         match = re.search(r'\b(\d{1,3}[a-z]?)\b', query)
@@ -66,7 +62,6 @@ def search_bns(query):
             if target_key in key:
                 return f"{key.title()}: {value}"
 
-    # STRATEGY 2: The Scoring Engine
     ignore_words = [
         "what", "is", "the", "for", "a", "of", "in", "to", "under", "how", "can", 
         "tell", "me", "about", "someone", "if", "who", "commits", "happens", "does",
@@ -99,7 +94,6 @@ def index():
 def chat():
     user_input = request.json.get("message", "").strip()
     
-    # Quick greeting check 
     greetings = ["hi", "hii", "hello", "hey", "greetings", "namaste"]
     if user_input.lower() in greetings:
         return jsonify({"response": "Hello! I am Nyaya, your Legal AI. Please ask me a specific legal question regarding the BNS."})
@@ -113,14 +107,14 @@ def chat():
             f"Do not use outside knowledge. If the facts do not explicitly mention the details asked, "
             f"say 'The BNS does not specify this detail.' Do not hallucinate penalties."
         )
-        print(f"🔍 FACT FOUND! Injecting: {retrieved_info[:60]}...") 
+        print(f"FACT FOUND! Injecting: {retrieved_info[:60]}...") 
     else:
         system_instruction = (
             "You are Nyaya. The user just asked about something that is NOT in the Bharatiya Nyaya Sanhita (BNS) database. "
             "You MUST reply EXACTLY with this sentence: 'I am sorry, but I am specifically trained on the Bharatiya Nyaya Sanhita (BNS). This topic falls outside my legal jurisdiction.' "
             "Do NOT provide any legal advice. Do NOT guess the penalty."
         )
-        print(f"🛑 NO FACTS FOUND. Triggering Guardrails.")
+        print(f"NO FACTS FOUND. Triggering Guardrails.")
 
     combined_input = f"{system_instruction}\n\nUser Question: {user_input}"
     
